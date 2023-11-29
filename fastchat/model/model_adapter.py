@@ -174,9 +174,10 @@ def load_model(
                 ] = "sequential"  # This is important for not the same VRAM sizes
                 available_gpu_memory = get_gpu_memory(num_gpus)
                 kwargs["max_memory"] = {
-                    i: str(int(available_gpu_memory[i] * 0.85)) + "GiB"
+                    i: str(int(available_gpu_memory[i] * 0.95)) + "GiB"
                     for i in range(num_gpus)
                 }
+                print('Running with modified GPU memory')
             else:
                 kwargs["max_memory"] = {i: max_gpu_memory for i in range(num_gpus)}
     elif device == "mps":
@@ -210,8 +211,9 @@ def load_model(
     elif load_8bit:
         if num_gpus != 1:
             warnings.warn(
-                "8-bit quantization is not supported for multi-gpu inference."
+                "8-bit quantization will be handled by the model adapter"
             )
+            kwargs["load_in_8bit"] = True
         else:
             return adapter.load_compress_model(
                 model_path=model_path,
